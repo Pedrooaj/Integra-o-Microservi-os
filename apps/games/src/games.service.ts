@@ -67,4 +67,33 @@ export class GamesService{
     game.isActive = false;
     return await this.gamesRepository.save(game);
   }
+
+  async updateRating(id: string, rating: number): Promise<Game> {
+    const game = await this.gamesRepository.findOne({ where: { id } });
+
+    if (!game) {
+      throw new NotFoundException(`Jogo com ID ${id} não encontrado`);
+    }
+
+    const newTotalReviews = game.totalReviews + 1;
+    const newAverageRating = ((game.averageRating * game.totalReviews) + rating) / newTotalReviews;
+
+    game.totalReviews = newTotalReviews;
+    game.averageRating = Number(newAverageRating.toFixed(2));
+
+    return await this.gamesRepository.save(game);
+  }
+
+  async searchGames(query: string): Promise<Game[]> {
+    return await this.gamesRepository.find({
+      where: [
+        { title: Like(`%${query}%`) },
+        { developer: Like(`%${query}%`) },
+        { publisher: Like(`%${query}%`) },
+        { genres: Like(`%${query}%`) },
+      ],
+      take: 10,
+    });
+  }
+  
 }
