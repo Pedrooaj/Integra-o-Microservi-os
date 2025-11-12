@@ -2,9 +2,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from 'src/prisma/prisma.service'; // Certifique-se que este caminho está correto
+import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { Prisma } from 'generated/prisma';
+
 
 @Injectable()
 export class AuthService {
