@@ -1,69 +1,35 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  ParseUUIDPipe,
-  Query
-} from '@nestjs/common';
+import {Controller, Get, Post, Put, Delete, Body, Param} from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
-
 
 @Controller('games')
 export class GamesController {
-  constructor(private readonly gamesService: GamesService) {}
+    constructor(private readonly gamesService: GamesService) {}
 
-  @Post()
-  create(@Body() createGameDto: CreateGameDto) {
-    return this.gamesService.createGame(createGameDto);
-  }
+    @Get()
+    getAllGames() {
+        return this.gamesService.findAll();
+    }
 
-  @Get()
-  getAll() {
-    return this.gamesService.getAllGames();
-  }
+    @Get(':id')
+    getGameById(@Param('id') id: string) {
+        return this.gamesService.findById(Number(id));
+    }
 
-  @Get(':id')
-  getById(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.gamesService.getGameById(id);
-  }
+    @Post()
+    createGame(@Body() createGameDto: CreateGameDto) {
+        return this.gamesService.create(createGameDto);
+    }
 
-  @Patch(':id')
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateGameDto: UpdateGameDto,
-  ) {
-    return this.gamesService.updateGame(id, updateGameDto);
-  }
+    @Put(':id')
+    updateGame(@Param('id') id: string, @Body() updatedGame: Partial<CreateGameDto>) {
+        return this.gamesService.update(Number(id), updatedGame);
+    }
 
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.gamesService.removeGame(id);
-  }
+    @Delete(':id')
+    deleteGame(@Param('id') id: string) {
+        this.gamesService.remove(Number(id));
+        return { message: `Game with ID ${id} has been deleted.` };
+    }
 
-  @Patch(':id/deactivate')
-  deactivate(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.gamesService.deactivateGame(id);
-  }
-
-  @Post(':id/rating')
-  updateRating(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body('rating') rating: number,
-  ) {
-    return this.gamesService.updateRating(id, rating);
-  }
-
-  @Get('search')
-  search(@Query('q') query: string) {
-    return this.gamesService.searchGames(query);
-  }
 }
