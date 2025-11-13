@@ -1,54 +1,30 @@
-import { IsString, IsNumber, IsArray, IsDate, IsBoolean, IsOptional, Min, Max, IsUrl } from 'class-validator';
+import {isInt, IsNumber, IsString, Min, Length, IsDate} from "class-validator";
 
 export class CreateGameDto {
-  @IsString()
-  title: string;
+    @IsString()
+    @Length(1, 100)
+    title: string;
 
-  @IsString()
-  description: string;
+    @IsString()
+    @Length(1, 300)
+    description: string;
 
-  @IsString()
-  developer: string;
+    @IsString({ each: true })
+    @Length(1, 50, { each: true })
+    genres: string[];
 
-  @IsString()
-  publisher: string;
+    @IsDate()
+    releaseDate: Date;
 
-  @IsNumber()
-  @Min(0)
-  price: number;
+    @IsString()
+    @Length(1, 100)
+    developer: string;
 
-  @IsNumber()
-  @Min(0)
-  @Max(1)
-  @IsOptional()
-  discount?: number;
+    @IsNumber()
+    @Min(0)
+    rating: number;
 
-  @IsArray()
-  @IsString({ each: true })
-  genres: string[];
-
-  @IsArray()
-  @IsString({ each: true })
-  platforms: string[];
-
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  tags?: string[];
-
-  @IsDate()
-  releaseDate: Date;
-
-  @IsUrl()
-  @IsOptional()
-  coverImage?: string;
-
-  @IsArray()
-  @IsUrl({}, { each: true })
-  @IsOptional()
-  screenshots?: string[];
-
-  @IsString()
-  @IsOptional()
-  systemRequirements?: string;
+    @IsNumber()
+    @Min(0)
+    price: number;
 }
