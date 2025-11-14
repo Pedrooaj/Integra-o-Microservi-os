@@ -1,4 +1,72 @@
 services:
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=authentication
+    container_name: auth
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:example@auth-db:5432/auth"
+    networks:
+      - db-network
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  games:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=games
+    container_name: games
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: "postgresql://postgres:example@games-db:5432/games"
+    networks:
+      - db-network
+    depends_on:
+      games-db:
+        condition: service_healthy
+
+  comments:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=comments
+    container_name: comments
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: "postgresql://postgres:example@comments-db:5432/comments"
+    networks:
+      - db-network
+    depends_on:
+      comments-db:
+        condition: service_healthy
+  users:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=users
+    container_name: users
+    ports:
+      - "3003:3003"
+    environment:
+      DATABASE_URL: "postgresql://postgres:example@users-db:5432/users"
+    networks:
+      - db-network
+    depends_on:
+      users-db:
+        condition: service_healthy
+
   auth-db:
     image: postgres:15-alpine
     container_name: auth-db
@@ -11,7 +79,7 @@ services:
     volumes:
       - auth-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +98,7 @@ services:
     volumes:
       - games-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -49,7 +117,7 @@ services:
     volumes:
       - comments-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -68,7 +136,7 @@ services:
     volumes:
       - users-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -80,6 +148,7 @@ volumes:
   games-data:
   comments-data:
   users-data:
+
 
 networks:
   db-network:
