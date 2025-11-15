@@ -4,6 +4,6 @@
     "declaration": false,
     "outDir": "../../dist/apps/comments"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "generated"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

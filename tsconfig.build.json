@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
-  "include": ["src", "generated"]
+  "include": ["src", "apps/authentication/generated", "apps/comments/generated", "apps/games/generated", "apps/users/generated"]
 }

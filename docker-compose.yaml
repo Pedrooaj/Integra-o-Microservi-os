@@ -2,11 +2,17 @@ services:
 
   auth:
     build:
+      target: development
       context: .
       dockerfile: Dockerfile
       args:
         - APP_NAME=authentication
     container_name: auth
+    volumes:
+      - .:/usr/src/app
+      # "Protege" o node_modules de dentro do container
+      - /usr/src/app/node_modules
+    command: npm run start:dev authentication
     ports:
       - "3000:3000"
     environment:
@@ -16,51 +22,68 @@ services:
     depends_on:
       auth-db:
         condition: service_healthy
+  comments:
+    build:
+      target: development
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=comments
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev comments
+    container_name: comments
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: "postgresql://postgres:example@comments-db:5433/comments"
+    networks:
+      - db-network
+    depends_on:
+      comments-db:
+        condition: service_healthy
 
   games:
     build:
+      target: development
       context: .
       dockerfile: Dockerfile
       args:
         - APP_NAME=games
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     container_name: games
+    command: npm run start:dev games
     ports:
-      - "3001:3001"
+      - "3002:3002"
     environment:
-      DATABASE_URL: "postgresql://postgres:example@games-db:5432/games"
+      DATABASE_URL: "postgresql://postgres:example@games-db:5434/games"
     networks:
       - db-network
     depends_on:
       games-db:
         condition: service_healthy
 
-  comments:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - APP_NAME=comments
-    container_name: comments
-    ports:
-      - "3002:3002"
-    environment:
-      DATABASE_URL: "postgresql://postgres:example@comments-db:5432/comments"
-    networks:
-      - db-network
-    depends_on:
-      comments-db:
-        condition: service_healthy
+  
   users:
     build:
+      target: development
       context: .
       dockerfile: Dockerfile
       args:
         - APP_NAME=users
+     
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     container_name: users
+    command: npm run start:dev users
     ports:
       - "3003:3003"
     environment:
-      DATABASE_URL: "postgresql://postgres:example@users-db:5432/users"
+      DATABASE_URL: "postgresql://postgres:example@users-db:5435/users"
     networks:
       - db-network
     depends_on:
@@ -86,6 +109,25 @@ services:
     networks:
       - db-network
 
+  comments-db:
+    image: postgres:15-alpine
+    container_name: comments-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: comments
+    ports:
+      - "5433:5432"
+    volumes:
+      - comments-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - db-network
+
   games-db:
     image: postgres:15-alpine
     container_name: games-db
@@ -94,7 +136,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: games
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - games-data:/var/lib/postgresql/data
     healthcheck:
@@ -105,24 +147,7 @@ services:
     networks:
       - db-network
 
-  comments-db:
-    image: postgres:15-alpine
-    container_name: comments-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: comments
-    ports:
-      - "5434:5432"
-    volumes:
-      - comments-data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - db-network
+
 
   users-db:
     image: postgres:15-alpine
