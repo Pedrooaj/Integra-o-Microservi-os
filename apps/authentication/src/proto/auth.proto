@@ -1,0 +1,62 @@
+// src/proto/auth.proto
+syntax = "proto3";
+
+package auth;
+
+// Corresponde aos @GrpcMethod("AuthService", ...) no seu controller
+service AuthService {
+  // rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+
+  // rpc Login (LoginRequest) returns (LoginResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  
+  // rpc ValidateToken (ValidateRequest) returns (ValidateResponse);
+  rpc ValidateToken (ValidateRequest) returns (ValidateResponse);
+}
+
+
+// --- MENSAGENS DE REQUISIÇÃO (Entradas) ---
+
+// Corresponde ao 'data' do método 'register' no AuthService
+// data: { email: string; password: string; name: string }
+message RegisterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+// Corresponde ao 'data' do método 'login' no AuthService
+// data: { email: string; password: string }
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// Corresponde ao 'data' do método 'validateToken' no AuthService
+// data: { token: string }
+message ValidateRequest {
+  string token = 1;
+}
+
+
+// --- MENSAGENS DE RESPOSTA (Saídas) ---
+
+// Corresponde ao 'return result' do 'register' no AuthService
+// O 'result' contém: { id, name, email, ... }
+message RegisterResponse {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+// Corresponde ao 'return { token }' do 'login' no AuthService
+message LoginResponse {
+  string token = 1;
+}
+
+// Corresponde ao 'return { isValid, userId }' do 'validateToken' no AuthService
+message ValidateResponse {
+  bool isValid = 1;
+  int32 userId = 2;
+}
