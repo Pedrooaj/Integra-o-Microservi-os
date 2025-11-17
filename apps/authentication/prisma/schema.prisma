@@ -1,0 +1,18 @@
+// apps/authentication/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/@prisma/client-auth"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_AUTH_URL")
+}
+
+// Um model simples para testarmos
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+}
