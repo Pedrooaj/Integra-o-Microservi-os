@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/authentication/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/authentication/tsconfig.app.json",
+    "assets": ["**/*.proto"],
+    "watchAssets": true
+  },
+  "monorepo": true,
+  "root": "apps/authentication",
+  "projects": {
+    "authentication": {
+      "type": "application",
+      "root": "apps/authentication",
+      "entryFile": "main",
+      "sourceRoot": "apps/authentication/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/authentication/tsconfig.app.json",
+        "assets": ["**/*.proto"],
+        "watchAssets": true
+      }
+    }
+  }
+}
