@@ -6,7 +6,9 @@
     "deleteOutDir": true,
     "webpack": true,
     "tsConfigPath": "apps/authentication/tsconfig.app.json",
-    "assets": ["**/*.proto"],
+    "assets": [
+      "**/*.proto"
+    ],
     "watchAssets": true
   },
   "monorepo": true,
@@ -19,8 +21,37 @@
       "sourceRoot": "apps/authentication/src",
       "compilerOptions": {
         "tsConfigPath": "apps/authentication/tsconfig.app.json",
-        "assets": ["**/*.proto"],
+        "assets": [
+          "**/*.proto"
+        ],
         "watchAssets": true
+      }
+    },
+    "comments": {
+      "type": "application",
+      "root": "apps/comments",
+      "entryFile": "main",
+      "sourceRoot": "apps/comments/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/comments/tsconfig.app.json"
+      }
+    },
+    "games": {
+      "type": "application",
+      "root": "apps/games",
+      "entryFile": "main",
+      "sourceRoot": "apps/games/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/games/tsconfig.app.json"
+      }
+    },
+    "users": {
+      "type": "application",
+      "root": "apps/users",
+      "entryFile": "main",
+      "sourceRoot": "apps/users/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/users/tsconfig.app.json"
       }
     }
   }

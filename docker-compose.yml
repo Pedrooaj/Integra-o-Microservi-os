@@ -13,9 +13,24 @@ services:
       - postgres_auth_steam_shopee_data:/var/lib/postgresql/data
     networks:
       - my_network
+  db-2:
+    image: postgres:16
+    container_name: users-db-steam-shopee-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_users_steam_shopee
+    ports:
+      - "5555:5432"
+    volumes:
+      - postgres_users_steam_shopee_data:/var/lib/postgresql/data
+    networks:
+      - my_network
 
 volumes:
   postgres_auth_steam_shopee_data:
+  postgres_users_steam_shopee_data:
 
 networks:
   my_network:

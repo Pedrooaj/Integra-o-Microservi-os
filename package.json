@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/Integra-o-Microservi-os/test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/Integra-o-Microservi-os/test/jest-e2e.json",
+    "start:all": "concurrently \"nest start authentication --watch\" \"nest start comments --watch\" \"nest start games --watch\" \"nest start users --watch\""
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.1",
@@ -26,6 +27,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/microservices": "^11.1.9",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.19.0",
@@ -44,6 +46,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "concurrently": "^9.2.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

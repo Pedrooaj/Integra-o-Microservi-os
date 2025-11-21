@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "name": "Integração",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0,
+  "filesCount": 0,
+  "protobuf": {
+    "protoFiles": [
+      {
+        "path": "../apps/users/src/proto/users.proto",
+        "type": "file"
+      }
+    ]
+  }
+}

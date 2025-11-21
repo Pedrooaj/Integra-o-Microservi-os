@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package users;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service UsersService {
+  rpc CreateUser(CreateUserInput) returns (User);
+  rpc FindAll(Empty) returns (UsersResponse);
+  rpc FindOne(UserRequest) returns (User);
+  rpc UpdateUser(UpdateUserInput) returns (User);
+  rpc RemoveUser(UserRequest) returns (Empty);
+}
+
+message User {
+  int32 id = 1;
+  string nickname = 2;
+  string avatarUrl = 3;
+  string realName = 4;
+  string bio = 5;
+  int32 level = 6;
+  int32 experience = 7;
+  string country = 8;
+  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp updatedAt = 10;
+}
+
+message CreateUserInput {
+  string nickname = 1;
+  string avatarUrl = 2;
+  string realName = 3;
+  string bio = 4;
+  string country = 5;
+}
+
+message UpdateUserInput {
+  int32 id = 1;
+  string nickname = 2;
+  string avatarUrl = 3;
+  string realName = 4;
+  string bio = 5;
+  string country = 6;
+}
+
+message UserRequest {
+  int32 id = 1;
+}
+
+message UsersResponse {
+  repeated User users = 1;
+}
+
+message Empty {}

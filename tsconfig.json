@@ -21,7 +21,12 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@prisma/client-auth": ["./node_modules/@prisma/client-auth"]
+      "@prisma/client-auth": [
+        "./node_modules/@prisma/client-auth"
+      ],
+      "@prisma/client-users": [
+        "./node_modules/@prisma/client-users"
+      ]
     }
   }
 }
