@@ -11,14 +11,14 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/Integra-o-Microservi-os/main",
+    "build:all": "for p in authentication comments games users; do npx nest build $p; done",
+    "start:prod": "concurrently \"node dist/apps/authentication/main.js\" \"node dist/apps/users/main.js\" \"node dist/apps/games/main.js\" \"node dist/apps/comments/main.js\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/Integra-o-Microservi-os/test/jest-e2e.json",
-    "start:all": "concurrently \"nest start authentication --watch\" \"nest start comments --watch\" \"nest start games --watch\" \"nest start users --watch\""
+    "test:e2e": "jest --config ./apps/Integra-o-Microservi-os/test/jest-e2e.json"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.1",
@@ -32,6 +32,9 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.19.0",
     "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.2.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

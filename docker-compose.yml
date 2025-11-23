@@ -13,7 +13,7 @@ services:
       - postgres_auth_steam_shopee_data:/var/lib/postgresql/data
     networks:
       - my_network
-  db-2:
+  db-users:
     image: postgres:16
     container_name: users-db-steam-shopee-postgres
     restart: always
@@ -22,15 +22,45 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db_users_steam_shopee
     ports:
-      - "5555:5432"
+      - "5455:5432"
     volumes:
       - postgres_users_steam_shopee_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+  db-games:
+    image: postgres:16
+    container_name: games-db-steam-shopee-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_games_steam_shopee
+    ports:
+      - "5456:5432"
+    volumes:
+      - postgres_games_steam_shopee_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+  db-comments:
+    image: postgres:16
+    container_name: comments-db-steam-shopee-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_comments_steam_shopee
+    ports:
+      - "5457:5432"
+    volumes:
+      - postgres_comments_steam_shopee_data:/var/lib/postgresql/data
     networks:
       - my_network
 
 volumes:
   postgres_auth_steam_shopee_data:
   postgres_users_steam_shopee_data:
+  postgres_games_steam_shopee_data:
+  postgres_comments_steam_shopee_data:
 
 networks:
   my_network:

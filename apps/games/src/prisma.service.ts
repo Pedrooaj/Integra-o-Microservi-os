@@ -1,18 +1,19 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from "@prisma/client-users"
+import { PrismaClient } from '@prisma/client-games';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor(config: ConfigService) {
-      super({
-        datasources: {
-          db: {
-            url: config.get<string>('DATABASE_USERS_URL'),
-          },
+    super({
+      datasources: {
+        db: {
+          // Garante que o Prisma use a URL carregada pelo Nest
+          url: config.get<string>('DATABASE_GAMES_URL'),
         },
-      });
-    }
+      },
+    });
+  }
 
   async onModuleInit() {
     await this.$connect();

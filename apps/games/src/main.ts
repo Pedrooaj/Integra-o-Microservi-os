@@ -3,6 +3,7 @@ import { GamesModule } from './games.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(GamesModule);
-  await app.listen(process.env.gamesPort ?? 3002);
+  await app.listen(3003);
+  console.log('🚀 Servidor de Games rodando  em http://localhost:3003');
 }
 bootstrap();

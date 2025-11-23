@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package comments;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service CommentsService {
+  rpc CreateComment(CreateCommentInput) returns (Comment);
+  rpc FindAll(Empty) returns (CommentsResponse);
+  rpc FindOne(CommentRequest) returns (Comment);
+  rpc FindByGame(GameRequest) returns (CommentsResponse);
+  rpc FindByUser(UserRequest) returns (CommentsResponse);
+  rpc UpdateComment(UpdateCommentInput) returns (Comment);
+  rpc RemoveComment(CommentRequest) returns (Empty);
+}
+
+message Comment {
+  int64 id = 1;
+  string description = 2;
+  int32 timePlayed = 3;
+  string gameId = 4;
+  string userId = 5;
+  google.protobuf.Timestamp createdAt = 6;
+}
+
+message CreateCommentInput {
+  string description = 1;
+  int32 timePlayed = 2;
+  string gameId = 3;
+  string userId = 4;
+}
+
+message UpdateCommentInput {
+  int64 id = 1;
+  string description = 2;
+  int32 timePlayed = 3;
+  string gameId = 4;
+  string userId = 5;
+}
+
+message CommentRequest {
+  int64 id = 1;
+}
+
+message GameRequest {
+  string gameId = 1;
+}
+
+message UserRequest {
+  string userId = 1;
+}
+
+message CommentsResponse {
+  repeated Comment comments = 1;
+}
+
+message Empty {}

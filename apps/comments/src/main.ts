@@ -1,9 +1,31 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { CommentsModule } from './comments.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(CommentsModule);
-  await app.listen(process.env.commentsPort ?? 3001);
+  const logger = new Logger('CommentsService');
 
+  // 1. Criar app principal
+  const app = await NestFactory.create(CommentsModule);
+
+  // 2. Conectar microserviço gRPC (Passando apenas as OPÇÕES, não uma nova instância)
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: 'comments',
+      protoPath: join(__dirname, 'proto/comments.proto'),
+      url: '0.0.0.0:50055',
+    },
+  });
+
+
+  await app.startAllMicroservices();
+  logger.log('Comments Service gRPC listening on port 50055');
+
+  await app.listen(3004);
+  logger.log('Comments Service REST listening on port 3004');
 }
 bootstrap();

@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/@prisma/client-comments"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_COMMENTS_URL") 
+}
+
+model Comment {
+  id          BigInt   @id @default(autoincrement())
+  description String
+  timePlayed  Int      // tempo jogado em minutos
+  createdAt   DateTime @default(now())
+  gameId      String
+  userId      String
+
+  @@index([gameId])
+  @@index([userId])
+}
