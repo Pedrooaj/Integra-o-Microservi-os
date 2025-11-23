@@ -25,7 +25,7 @@ export class CommentsController {
 
   @Get()
   findAll(
-    @Query('gameId') gameId?: string,
+    @Query('gameId') gameId?: bigint,
     @Query('userId') userId?: string,
   ) {
     if (gameId) {
@@ -73,7 +73,7 @@ export class CommentsController {
   }
 
   @GrpcMethod('CommentsService', 'FindByGame')
-  findByGameGrpc({ gameId }: { gameId: string }) {
+  findByGameGrpc({ gameId }: { gameId: bigint }) {
     return this.commentsService.findByGame(gameId);
   }
 

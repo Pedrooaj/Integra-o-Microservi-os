@@ -10,7 +10,7 @@ export class CreateCommentDto {
   timePlayed: number; // tempo jogado em minutos
 
   @IsString()
-  gameId: string;
+  gameId: bigint;
 
   @IsString()
   userId: string;

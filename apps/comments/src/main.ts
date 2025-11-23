@@ -5,6 +5,10 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { Logger } from '@nestjs/common';
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 async function bootstrap() {
   const logger = new Logger('CommentsService');
 

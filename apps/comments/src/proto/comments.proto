@@ -2,21 +2,27 @@ syntax = "proto3";
 
 package comments;
 
+// Imports oficiais do Google
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service CommentsService {
   rpc CreateComment(CreateCommentInput) returns (Comment);
-  rpc FindAll(Empty) returns (CommentsResponse);
+  
+  // Use google.protobuf.Empty aqui
+  rpc FindAll(google.protobuf.Empty) returns (CommentsResponse);
+  
   rpc FindOne(CommentRequest) returns (Comment);
   rpc FindByGame(GameRequest) returns (CommentsResponse);
   rpc FindByUser(UserRequest) returns (CommentsResponse);
   rpc UpdateComment(UpdateCommentInput) returns (Comment);
-  rpc RemoveComment(CommentRequest) returns (Empty);
+  
+  // Use google.protobuf.Empty aqui também
+  rpc RemoveComment(CommentRequest) returns (google.protobuf.Empty);
 }
 
 message Comment {
-  int64 id = 1;
+  int64 id = 1; 
   string description = 2;
   int32 timePlayed = 3;
   string gameId = 4;
@@ -55,4 +61,4 @@ message CommentsResponse {
   repeated Comment comments = 1;
 }
 
-message Empty {}
+// REMOVIDO: message Empty {} (Pois já importamos lá em cima)

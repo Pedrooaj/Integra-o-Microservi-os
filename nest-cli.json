@@ -33,7 +33,11 @@
       "entryFile": "main",
       "sourceRoot": "apps/comments/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/comments/tsconfig.app.json"
+        "tsConfigPath": "apps/comments/tsconfig.app.json",
+        "assets": [
+          "**/*.proto"
+        ],
+        "watchAssets": true
       }
     },
     "games": {
@@ -42,7 +46,11 @@
       "entryFile": "main",
       "sourceRoot": "apps/games/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/games/tsconfig.app.json"
+        "tsConfigPath": "apps/games/tsconfig.app.json",
+        "assets": [
+          "**/*.proto"
+        ],
+        "watchAssets": true
       }
     },
     "users": {
@@ -51,7 +59,11 @@
       "entryFile": "main",
       "sourceRoot": "apps/users/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/users/tsconfig.app.json"
+        "tsConfigPath": "apps/users/tsconfig.app.json",
+        "assets": [
+          "**/*.proto"
+        ],
+        "watchAssets": true
       }
     }
   }

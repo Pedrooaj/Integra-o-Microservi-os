@@ -1,11 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { Games } from "./games.model";
 import { CreateGameDto } from "./dto/create-game.dto";
+import { PrismaService } from "./prisma.service";
 
 @Injectable()
 export class GamesService {
     private games: Games[] = [];
     private idCounter = 1;
+
+    constructor(private readonly prisma: PrismaService) {}
 
     findAll(): Games[] {
         return this.games;
@@ -41,5 +44,11 @@ export class GamesService {
         }
         this.games.splice(this.games.indexOf(gameId), 1);
         console.log(`Game with ID ${id} has been removed.`);
+    }
+
+    async findOne(id: bigint) {
+        return this.prisma.game.findUnique({
+            where: { id },
+        });
     }
 }

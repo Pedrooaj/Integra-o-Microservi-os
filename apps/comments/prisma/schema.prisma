@@ -13,7 +13,7 @@ model Comment {
   description String
   timePlayed  Int      // tempo jogado em minutos
   createdAt   DateTime @default(now())
-  gameId      String
+  gameId      BigInt
   userId      String
 
   @@index([gameId])

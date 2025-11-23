@@ -1,6 +1,7 @@
 import {Controller, Get, Post, Put, Delete, Body, Param} from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
+import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller('games')
 export class GamesController {
@@ -32,4 +33,8 @@ export class GamesController {
         return { message: `Game with ID ${id} has been deleted.` };
     }
 
+    @GrpcMethod('GamesService', 'FindOneGame')
+    findOne(data: { id: bigint }) {
+        return this.gamesService.findOne(data.id);
+    }
 }

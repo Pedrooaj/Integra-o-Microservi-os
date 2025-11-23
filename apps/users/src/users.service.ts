@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common'; // Use NotFoundException ou RpcException
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from './prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,11 +23,19 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+  async findOne(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new RpcException('User not found');
+    }
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    await this.findOne(id); 
+
     const { id: _, ...data } = updateUserDto;
     return this.prisma.user.update({
       where: { id },
@@ -35,7 +43,9 @@ export class UsersService {
     });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    await this.findOne(id);
+
     return this.prisma.user.delete({ where: { id } });
   }
 }
