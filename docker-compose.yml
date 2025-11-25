@@ -1,5 +1,40 @@
 services:
 
+
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: always
+    command: 
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      # entrypoints
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Configuração do dashboard API
+      - --api.dashboard=true
+      # Redirecionamento Global HTTP -> HTTPS
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      # Configuração LetsEncrypt
+      - --certificatesresolvers.le.acme.email=pedroantonio5735@gmail.com 
+      - --certificatesresolvers.le.acme.storage=/etc/traefik/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Porta do dashboard do Traefik
+    networks:
+      - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.pedrooaj.cloud`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=le"
+
+
   # PostgreSQL Databases da Steam Shopee
   db:
     image: postgres:16
@@ -63,7 +98,8 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile volumes:
+      - postgres_auth_steam_shopee_data:/var/lib/postgresql/data
       args:
         APP_NAME: authentication
     container_name: authentication
@@ -77,7 +113,16 @@ services:
       - db
     networks:
       - my_network
-  
+    labels:
+      - "traefik.enable=true"
+      # Regra de roteamento: usa subdomínio para HTTPS
+      - "traefik.http.routers.auth-service.rule=Host(`auth.pedrooaj.cloud`)" # ➡️ MUDAR
+      # Usa o entrypoint seguro 443
+      - "traefik.http.routers.auth-service.entrypoints=websecure"
+      # Aplica o Resolvedor de Certificados 'le'
+      - "traefik.http.routers.auth-service.tls.certresolver=le"
+      # Porta interna do serviço
+      - "traefik.http.services.auth-service.loadbalancer.server.port=3001"
   users-service:
     build: 
       context: .
@@ -95,6 +140,12 @@ services:
       - db-users
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.users-service.rule=Host(`users.pedrooaj.cloud`)" # ➡️ MUDAR
+      - "traefik.http.routers.users-service.entrypoints=websecure"
+      - "traefik.http.routers.users-service.tls.certresolver=le"
+      - "traefik.http.services.users-service.loadbalancer.server.port=3002"
 
   games-service:
     build:
@@ -113,6 +164,12 @@ services:
       - db-games
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.games-service.rule=Host(`games.pedrooaj.cloud`)" # ➡️ MUDAR
+      - "traefik.http.routers.games-service.entrypoints=websecure"
+      - "traefik.http.routers.games-service.tls.certresolver=le"
+      - "traefik.http.services.games-service.loadbalancer.server.port=3003"
   
   comments-service:
     build: 
@@ -131,6 +188,12 @@ services:
       - db-comments
     networks:
       - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.comments-service.rule=Host(`comments.pedrooaj.cloud`)" # ➡️ MUDAR
+      - "traefik.http.routers.comments-service.entrypoints=websecure"
+      - "traefik.http.routers.comments-service.tls.certresolver=le"
+      - "traefik.http.services.comments-service.loadbalancer.server.port=3004"
   
 volumes:
   postgres_auth_steam_shopee_data:
