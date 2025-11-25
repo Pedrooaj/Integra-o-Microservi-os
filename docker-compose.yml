@@ -98,7 +98,8 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: Dockerfile volumes:
+      dockerfile: Dockerfile 
+      volumes:
       - postgres_auth_steam_shopee_data:/var/lib/postgresql/data
       args:
         APP_NAME: authentication
