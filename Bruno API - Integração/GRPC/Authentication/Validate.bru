@@ -1,0 +1,21 @@
+meta {
+  name: Validate
+  type: grpc
+  seq: 3
+}
+
+grpc {
+  url: http://localhost:50051
+  body: grpc
+  protoPath: ../apps/authentication/src/proto/auth.proto
+  auth: inherit
+}
+
+body:grpc {
+  name: message 1
+  content: '''
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZDY2NzQ3ZS1jYjE1LTRkY2YtOWIyMi02YTA3NmI0ZThkNjEiLCJlbWFpbCI6InBlZHJvYW50b25pbzU3MzVAZ21haWwuY29tIiwiaWF0IjoxNzY0MDc5MjI1LCJleHAiOjE3NjQwODI4MjV9.dxYKrllv8kmafY_8lS_gL_t5BtfECTayzhzJjeF6DjE"
+    }
+  '''
+}

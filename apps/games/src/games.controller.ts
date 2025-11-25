@@ -3,7 +3,7 @@ import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { GrpcMethod } from '@nestjs/microservices';
 
-@Controller('games')
+@Controller('/api/v1/games')
 export class GamesController {
     constructor(private readonly gamesService: GamesService) {}
 

@@ -1,0 +1,25 @@
+meta {
+  name: Register
+  type: grpc
+  seq: 1
+}
+
+grpc {
+  url: http://localhost:50051
+  method: /auth.AuthService/Register
+  body: grpc
+  protoPath: ../apps/authentication/src/proto/auth.proto
+  auth: inherit
+  methodType: unary
+}
+
+body:grpc {
+  name: message 1
+  content: '''
+    {
+     "email": "pedroantonio5735@gmail.com",
+      "password": "123456",
+      "name": "pedrooaj"
+    }
+  '''
+}

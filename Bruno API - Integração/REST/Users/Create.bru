@@ -1,0 +1,26 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3002/api/v1/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: aaa
+}
+
+body:json {
+  {
+    "nickname": "tesaaaate"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Validate
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3001/api/v1/authentication/validate
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZDY2NzQ3ZS1jYjE1LTRkY2YtOWIyMi02YTA3NmI0ZThkNjEiLCJlbWFpbCI6InBlZHJvYW50b25pbzU3MzVAZ21haWwuY29tIiwiaWF0IjoxNzY0MDc5NjMxLCJleHAiOjE3NjQwODMyMzF9.4nXiP-F1kGGBLqt4jVbaNmxY9-47TvNaFJvW-GsVIOs
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

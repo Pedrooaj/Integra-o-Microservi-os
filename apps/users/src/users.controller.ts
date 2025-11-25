@@ -7,19 +7,26 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  Headers,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('users')
+@Controller('api/v1/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // REST endpoints
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Headers("authorization") authHeader: string  ,@Body() createUserDto: CreateUserDto) {
+    const token = authHeader?.split(" ")[1];
+    if (!authHeader) {
+      throw new UnauthorizedException('Token not provided');
+    }
+    await this.usersService.validateUserIntegrity(token);
     return this.usersService.create(createUserDto);
   }
 

@@ -1,4 +1,6 @@
 services:
+
+  # PostgreSQL Databases da Steam Shopee
   db:
     image: postgres:16
     container_name: auth-db-steam-shopee-postgres
@@ -55,7 +57,81 @@ services:
       - postgres_comments_steam_shopee_data:/var/lib/postgresql/data
     networks:
       - my_network
+  
+  
+  # Serviços em NEST JS da Steam Shopee
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: authentication
+    container_name: authentication
+    restart: always
+    ports:
+      - "3001:3001"
+      - "50051:50051"
+    environment:
+      DATABASE_AUTH_URL: "postgresql://postgres:postgres@db:5432/db_auth_steam_shopee?schema=public"
+    depends_on:
+      - db
+    networks:
+      - my_network
+  
+  users-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: users
+    container_name: users
+    restart: always
+    ports:
+      - "3002:3002"
+      - "50052:50052"
+    environment:
+      DATABASE_USERS_URL: "postgresql://postgres:postgres@db-users:5432/db_users_steam_shopee?schema=public"
+    depends_on:
+      - db-users
+    networks:
+      - my_network
 
+  games-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: games
+    container_name: games
+    restart: always
+    ports:
+      - "3003:3003"
+      - "50053:50053"
+    environment:
+      DATABASE_GAMES_URL: "postgresql://postgres:postgres@db-games:5432/db_games_steam_shopee?schema=public"
+    depends_on:
+      - db-games
+    networks:
+      - my_network
+  
+  comments-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: comments
+    container_name: comments
+    restart: always
+    ports:
+      - "3004:3004"
+      - "50055:50055"
+    environment:
+      DATABASE_COMMENTS_URL: "postgresql://postgres:postgres@db-comments:5432/db_comments_steam_shopee?schema=public"
+    depends_on:
+      - db-comments
+    networks:
+      - my_network
+  
 volumes:
   postgres_auth_steam_shopee_data:
   postgres_users_steam_shopee_data:

@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "name": "Bruno API - Integração",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0,
+  "filesCount": 0,
+  "protobuf": {
+    "protoFiles": [
+      {
+        "path": "../apps/authentication/src/proto/auth.proto",
+        "type": "file"
+      }
+    ]
+  }
+}

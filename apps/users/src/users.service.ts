@@ -1,12 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common'; // Use NotFoundException ou RpcException
-import { RpcException } from '@nestjs/microservices';
+import { Inject, Injectable, NotFoundException, OnModuleInit, UnauthorizedException } from '@nestjs/common'; // Use NotFoundException ou RpcException
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { PrismaService } from './prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGrpcService } from './auth-grpc-service.interface';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+export class UsersService implements OnModuleInit {
+  private authService: AuthGrpcService;
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject("AUTH_PACKAGE") private client: ClientGrpc,
+  ) { }
+
+  onModuleInit() {
+    this.authService = this.client.getService<AuthGrpcService>("AuthService");
+  }
+
+  async validateUserIntegrity(token: string) {
+    try {
+      const result = await firstValueFrom(this.authService.validate({ token }));
+      if (!result || result.valid === false) {
+        throw new UnauthorizedException("Invalid token or user does not exist");
+      }
+      return result;
+    } catch (error) {
+      console.error(error);
+      throw new UnauthorizedException("Could not validate user integrity");
+    }
+  }
+
+
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -34,7 +59,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    await this.findOne(id); 
+    await this.findOne(id);
 
     const { id: _, ...data } = updateUserDto;
     return this.prisma.user.update({
