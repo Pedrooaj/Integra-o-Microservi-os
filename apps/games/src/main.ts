@@ -15,7 +15,7 @@ async function bootstrap() {
     },
   });
 
-  app.setGlobalPrefix("api/v1/games");
+
   await app.startAllMicroservices();  
   await app.listen(3003);
   console.log('🚀 Servidor de Games rodando  em http://localhost:3003');

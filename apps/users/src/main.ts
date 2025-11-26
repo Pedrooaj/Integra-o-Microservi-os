@@ -21,8 +21,6 @@ async function bootstrap() {
 
   // await app.startAllMicroservices();
   // logger.log('Users Service gRPC listening on port 50052');
-
-  app.setGlobalPrefix("api/v1/users");
   await app.listen(3002);
   logger.log('Users Service REST listening on port 3002');
 }
