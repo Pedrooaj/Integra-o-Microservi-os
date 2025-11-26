@@ -24,7 +24,7 @@ async function bootstrap() {
   logger.log('Microservice Auth is listening on GRPC port 50051');
 
   // 4. Inicia a escuta HTTP
-  await app.listen(3001);
-  logger.log('Microservice Auth is listening on REST port 3001');
+  // await app.listen(process.env.AUTHENTICATION_PORT || 3001);
+  // logger.log('Microservice Auth is listening on REST port 3001');
 }
 bootstrap();
