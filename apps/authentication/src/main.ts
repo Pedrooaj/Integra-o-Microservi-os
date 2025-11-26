@@ -22,7 +22,6 @@ async function bootstrap() {
   // logger.log('Microservice Auth is listening on GRPC port 50051');
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
-  app.setGlobalPrefix("api/v1/authentication");
 
    await app.listen(3001);
    logger.log('Microservice Auth is listening on REST port 3001');
