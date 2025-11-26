@@ -1,36 +1,41 @@
 services:
-
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.0
     container_name: traefik
-    restart: always
     command:
+      - "--api.insecure=true" # Habilita Dashboard na porta 8080 (cuidado em prod)
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.exposedbydefault=false" # Só expõe quem tiver label enable=true
       - "--entrypoints.web.address=:80"
-      - "--api.dashboard=true"
     ports:
-      - "80:80"
-      - "8080:8080"
+      - "80:80"     # Porta HTTP (Opcional se usar só Tunnel, mas bom para debug local)
+      - "8080:8080" # Dashboard do Traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - my_network
-  
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok
+    labels:
+      - "traefik.enable=true"
+      # Regra: Se o domínio for microservices...
+      - "traefik.http.routers.dashboard.rule=Host(`microservices.pedrooaj.cloud`)"
+      # Aponta para o serviço interno do Traefik (api@internal é "mágico", já existe dentro dele)
+      - "traefik.http.routers.dashboard.service=api@internal"
+      # Usa o entrypoint web (porta 80 onde o Tunnel entrega o tráfego)
+      - "traefik.http.routers.dashboard.entrypoints=web"
+    
+      
+
+  # Cloudflare Tunnel (Substitui a necessidade de abrir portas no roteador)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
     restart: always
-    depends_on:
-      - traefik
-    command:
-      - "http"
-      - "traefik:80"
     environment:
-      NGROK_AUTHTOKEN: "${NGROK_AUTHTOKEN}"
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN} # Defina isso no seu arquivo .env
+    command: tunnel run
     networks:
       - my_network
-
+  
 
   # --- DATABASES (Sem alterações) ---
   db:
@@ -105,15 +110,22 @@ services:
       - "3001:3001"
       - "50051:50051"
     environment:
-      DATABASE_AUTH_URL: "postgresql://postgres:postgres@db:5432/db_auth_steam_shopee?schema=public"
+      - DATABASE_AUTH_URL=postgresql://postgres:postgres@db:5432/db_auth_steam_shopee?schema=public
+      
     depends_on:
       - db
     networks:
       - my_network
     labels:
       - "traefik.enable=true"
+      # Define a rota: se começar com /auth
       - "traefik.http.routers.auth.rule=PathPrefix(`/api/v1/authentication`)"
-      - "traefik.http.services.auth-service.loadbalancer.server.port=3001"
+      # Aponta para a porta interna do container (3001)
+      - "traefik.http.services.auth.loadbalancer.server.port=3001"
+      # Middleware para remover o prefixo /auth antes de enviar para o NestJS
+      - "traefik.http.middlewares.auth-strip.stripprefix.prefixes=/"
+      - "traefik.http.routers.auth.middlewares=auth-strip"
+
 
   users-service:
     build: 
@@ -127,7 +139,9 @@ services:
       - "3002:3002"
       - "50052:50052"
     environment:
-      DATABASE_USERS_URL: "postgresql://postgres:postgres@db-users:5432/db_users_steam_shopee?schema=public"
+      - DATABASE_USERS_URL=postgresql://postgres:postgres@db-users:5432/db_users_steam_shopee?schema=public
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+      
     depends_on:
       - db-users
     networks:
@@ -135,7 +149,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.users.rule=PathPrefix(`/api/v1/users`)"
-      - "traefik.http.services.users-service.loadbalancer.server.port=3002"
+      - "traefik.http.services.users.loadbalancer.server.port=3002"
+      - "traefik.http.middlewares.users-strip.stripprefix.prefixes=/"
+      - "traefik.http.routers.users.middlewares=users-strip"
+
+
 
   games-service:
     build:
@@ -149,7 +167,8 @@ services:
       - "3003:3003"
       - "50053:50053"
     environment:
-      DATABASE_GAMES_URL: "postgresql://postgres:postgres@db-games:5432/db_games_steam_shopee?schema=public"
+      - DATABASE_GAMES_URL=postgresql://postgres:postgres@db-games:5432/db_games_steam_shopee?schema=public
+      
     depends_on:
       - db-games
     networks:
@@ -157,7 +176,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.games.rule=PathPrefix(`/api/v1/games`)"
-      - "traefik.http.services.games-service.loadbalancer.server.port=3003"
+      - "traefik.http.services.games.loadbalancer.server.port=3003"
+      - "traefik.http.middlewares.games-strip.stripprefix.prefixes=/"
+      - "traefik.http.routers.games.middlewares=games-strip"
+
   
   comments-service:
     build: 
@@ -171,7 +193,10 @@ services:
       - "3004:3004"
       - "50055:50055"
     environment:
-      DATABASE_COMMENTS_URL: "postgresql://postgres:postgres@db-comments:5432/db_comments_steam_shopee?schema=public"
+      - DATABASE_COMMENTS_URL=postgresql://postgres:postgres@db-comments:5432/db_comments_steam_shopee?schema=public
+      - USERS_SERVICE_URL=${USERS_SERVICE_URL}
+      - GAMES_SERVICE_URL=${GAMES_SERVICE_URL}
+      
     depends_on:
       - db-comments
     networks:
@@ -179,7 +204,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.comments.rule=PathPrefix(`/api/v1/comments`)"
-      - "traefik.http.services.comments-service.loadbalancer.server.port=3004"
+      - "traefik.http.services.comments.loadbalancer.server.port=3004"
+      - "traefik.http.middlewares.comments-strip.stripprefix.prefixes=/"
+      - "traefik.http.routers.comments.middlewares=comments-strip"
+
   
 volumes:
   postgres_auth_steam_shopee_data:
