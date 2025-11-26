@@ -25,520 +25,302 @@
 {
   "id": 1,
   "title": "The Witcher 3",
-  "description": "An open-world RPG with amazing story and characters",
-  "genres": ["RPG", "Action", "Adventure"],
-  "releaseDate": "2015-05-19T00:00:00.000Z",
-  "developer": "CD Projekt Red",
-  "rating": 9.5,
-  "price": 59.99
-}
-```
+  # API Payloads - Serviços
 
----
+  Este arquivo descreve os endpoints REST e RPC (gRPC) disponíveis no monorepo, com exemplos de request/response e comandos `curl`/`grpcurl`.
 
-#### 2. Get All Games
-**Method:** `GET /games`
+  Observação: alguns endpoints exigem cabeçalho `Authorization: Bearer <token>` (ex.: criação de usuário pela API interna). Ajuste URLs/ports conforme sua configuração local.
 
-**Response (200):**
-```json
-[
+  ## 🎮 Games Service
+
+  Base REST (ex.: `http://localhost:3000`)
+
+  ### 1) Criar Jogo
+  Method: `POST /games`
+
+  Request body (JSON):
+  ```json
   {
-    "id": 1,
     "title": "The Witcher 3",
-    "description": "An open-world RPG with amazing story and characters",
+    "description": "Um RPG de mundo aberto com ótima história",
     "genres": ["RPG", "Action", "Adventure"],
     "releaseDate": "2015-05-19T00:00:00.000Z",
     "developer": "CD Projekt Red",
     "rating": 9.5,
     "price": 59.99
-  },
-  {
-    "id": 2,
-    "title": "Cyberpunk 2077",
-    "description": "A futuristic action RPG",
-    "genres": ["RPG", "Action", "Sci-Fi"],
-    "releaseDate": "2020-12-10T00:00:00.000Z",
-    "developer": "CD Projekt Red",
-    "rating": 7.8,
-    "price": 49.99
   }
-]
-```
+  ```
 
----
+  Response (exemplo): objeto do jogo criado (ID, timestamps conforme implementação).
 
-#### 3. Get Game by ID
-**Method:** `GET /games/:id`
+  ### 2) Listar jogos
+  Method: `GET /games`
 
-**Example:** `GET /games/1`
+  Response: array de jogos.
 
-**Response (200):**
-```json
-{
-  "id": 1,
-  "title": "The Witcher 3",
-  "description": "An open-world RPG with amazing story and characters",
-  "genres": ["RPG", "Action", "Adventure"],
-  "releaseDate": "2015-05-19T00:00:00.000Z",
-  "developer": "CD Projekt Red",
-  "rating": 9.5,
-  "price": 59.99
-}
-```
+  ### 3) Obter jogo por ID
+  Method: `GET /games/:id`
 
----
+  Response: objeto do jogo.
 
-#### 4. Update Game
-**Method:** `PUT /games/:id`
+  ### 4) Atualizar jogo
+  Method: `PUT /games/:id`
 
-**Example:** `PUT /games/1`
-
-**Request Body:**
-```json
-{
-  "title": "The Witcher 3: Wild Hunt",
-  "rating": 9.7,
-  "price": 39.99
-}
-```
-
-**Response (200):**
-```json
-{
-  "id": 1,
-  "title": "The Witcher 3: Wild Hunt",
-  "description": "An open-world RPG with amazing story and characters",
-  "genres": ["RPG", "Action", "Adventure"],
-  "releaseDate": "2015-05-19T00:00:00.000Z",
-  "developer": "CD Projekt Red",
-  "rating": 9.7,
-  "price": 39.99
-}
-```
-
----
-
-#### 5. Delete Game
-**Method:** `DELETE /games/:id`
-
-**Example:** `DELETE /games/1`
-
-**Response (200):**
-```json
-{
-  "message": "Game with ID 1 has been deleted."
-}
-```
-
----
-
-## 👥 USERS SERVICE
-
-### REST API (PORT 3002)
-
-#### 1. Create User
-**Method:** `POST /users`
-
-**Request Body:**
-```json
-{
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "country": "Brazil"
-}
-```
-
-**Response (201):**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "level": 1,
-  "experience": 0,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00.000Z",
-  "updatedAt": "2025-11-22T21:45:00.000Z"
-}
-```
-
----
-
-#### 2. Get All Users
-**Method:** `GET /users`
-
-**Response (200):**
-```json
-[
+  Request body: campos parciais ou completos (`CreateGameDto` usado para validação). Exemplo:
+  ```json
   {
-    "id": 1,
+    "title": "The Witcher 3: Wild Hunt",
+    "rating": 9.7,
+    "price": 39.99
+  }
+  ```
+
+  ### 5) Deletar jogo
+  Method: `DELETE /games/:id`
+
+  Response (exemplo):
+  ```json
+  { "message": "Game with ID 1 has been deleted." }
+  ```
+
+  gRPC
+  - RPC `FindOneGame` expõe busca por ID (aceita `{ id: bigint }`).
+
+  ---
+
+  ## 👥 Users Service
+
+  Base REST (ex.: `http://localhost:3002`)
+
+  > Observação: o endpoint `POST /users` (no controller atual) espera um header `Authorization` e valida o token antes de criar o usuário.
+
+  ### 1) Criar usuário
+  Method: `POST /users`
+
+  Headers:
+  - `Authorization: Bearer <token>` (obrigatório conforme `UsersController`)
+
+  Request body (JSON `CreateUserDto`):
+  ```json
+  {
     "nickname": "player_pro",
     "avatarUrl": "https://example.com/avatars/player.jpg",
     "realName": "João Silva",
-    "bio": "Passionate gamer and collector",
-    "level": 1,
-    "experience": 0,
-    "country": "Brazil",
-    "createdAt": "2025-11-22T21:45:00.000Z",
-    "updatedAt": "2025-11-22T21:45:00.000Z"
-  },
-  {
-    "id": 2,
-    "nickname": "gamer_king",
-    "avatarUrl": "https://example.com/avatars/king.jpg",
-    "realName": "Maria Santos",
-    "bio": null,
-    "level": 5,
-    "experience": 500,
-    "country": "Portugal",
-    "createdAt": "2025-11-22T20:30:00.000Z",
-    "updatedAt": "2025-11-22T20:30:00.000Z"
+    "bio": "Gamer apaixonado",
+    "country": "Brazil"
   }
-]
-```
+  ```
 
----
+  Response (exemplo): objeto do usuário criado com `id`, `level`, `experience`, timestamps.
 
-#### 3. Get User by ID
-**Method:** `GET /users/:id`
+  ### 2) Listar usuários
+  Method: `GET /users`
 
-**Example:** `GET /users/1`
+  Response: array de usuários.
 
-**Response (200):**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "level": 1,
-  "experience": 0,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00.000Z",
-  "updatedAt": "2025-11-22T21:45:00.000Z"
-}
-```
+  ### 3) Obter usuário por ID
+  Method: `GET /users/:id`
 
----
+  Response: objeto do usuário.
 
-#### 4. Update User
-**Method:** `PATCH /users/:id`
+  ### 4) Atualizar usuário
+  Method: `PATCH /users/:id`
 
-**Example:** `PATCH /users/1`
+  Request body (parcial, `UpdateUserDto`):
+  ```json
+  {
+    "level": 3,
+    "experience": 250,
+    "bio": "Bio atualizada"
+  }
+  ```
 
-**Request Body:**
-```json
-{
-  "level": 3,
-  "experience": 250,
-  "bio": "Updated bio"
-}
-```
+  ### 5) Deletar usuário
+  Method: `DELETE /users/:id`
 
-**Response (200):**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Updated bio",
-  "level": 3,
-  "experience": 250,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00.000Z",
-  "updatedAt": "2025-11-22T21:50:00.000Z"
-}
-```
+  Response: geralmente `{}` quando removido com sucesso.
 
----
+  gRPC (Users)
+  - Métodos esperados (conforme protos): `CreateUser`, `FindAll`, `FindOne`, `UpdateUser`, `RemoveUser`.
+  - Payloads similares às estruturas JSON acima (IDs numéricos conforme proto).
 
-#### 5. Delete User
-**Method:** `DELETE /users/:id`
+  ---
 
-**Example:** `DELETE /users/1`
+  ## 🔐 Authentication Service
 
-**Response (200):**
-```json
-{}
-```
+  Base REST (ex.: `http://localhost:3001`)
 
----
+  ### 1) Registro (REST + gRPC)
+  Method: `POST /register`
 
-## 📡 gRPC API
+  Request body (`RegisterDto`):
+  ```json
+  {
+    "name": "João",
+    "email": "joao@example.com",
+    "password": "suaSenhaSecreta"
+  }
+  ```
 
-### Users Service (PORT 50052)
+  Response (exemplo): pode retornar o usuário criado ou token, conforme implementação do `AuthenticationService`.
 
-#### 1. CreateUser RPC
+  ### 2) Login (REST + gRPC)
+  Method: `POST /login`
 
-**Request:**
-```json
-{
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "country": "Brazil"
-}
-```
+  Request body (`LoginDto`):
+  ```json
+  {
+    "email": "joao@example.com",
+    "password": "suaSenhaSecreta"
+  }
+  ```
 
-**Response:**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "level": 1,
-  "experience": 0,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00Z",
-  "updatedAt": "2025-11-22T21:45:00Z"
-}
-```
+  Response (exemplo):
+  ```json
+  {
+    "accessToken": "<jwt>",
+    "user": { "id": 1, "email": "joao@example.com", "name": "João" }
+  }
+  ```
 
----
+  ### 3) Validate (REST + gRPC)
+  Method: `POST /validate` (REST: envia token no header `Authorization`)
 
-#### 2. FindAll RPC
+  REST: enviar header `Authorization: Bearer <token>`; o controller extrai o token e chama `validate`.
 
-**Request:**
-```json
-{}
-```
+  gRPC: `Validate` recebe `{ token: string }`.
 
-**Response:**
-```json
-{
-  "users": [
-    {
-      "id": 1,
+  Response: validação do token (ex.: `{ valid: true, userId: '...' }` ou dados do usuário).
+
+  ---
+
+  ## 💬 Comments Service
+
+  Base REST (ex.: `http://localhost:3003`)
+
+  DTO importante: `CreateCommentDto` (campos obrigatórios/validados)
+  - `description` (string, 1-500)
+  - `timePlayed` (number, minutos, >=0)
+  - `gameId` (string / bigint)
+  - `userId` (string)
+
+  ### 1) Criar comentário
+  Method: `POST /comments`
+
+  Request body:
+  ```json
+  {
+    "description": "Muito divertido, joguei por horas!",
+    "timePlayed": 120,
+    "gameId": "123456789012345678",
+    "userId": "user-uuid-or-id"
+  }
+  ```
+
+  ### 2) Listar comentários
+  Method: `GET /comments`
+
+  Query params suportados:
+  - `gameId` (filtrar por jogo)
+  - `userId` (filtrar por usuário)
+
+  Exemplo: `GET /comments?gameId=123456789012345678`
+
+  ### 3) Obter comentário por ID
+  Method: `GET /comments/:id`
+
+  O controller converte `id` para `BigInt` internamente.
+
+  ### 4) Atualizar comentário
+  Method: `PATCH /comments/:id`
+
+  Request body (exemplo - `UpdateCommentDto` é parcial):
+  ```json
+  {
+    "description": "Atualizei a avaliação",
+    "timePlayed": 130
+  }
+  ```
+
+  ### 5) Deletar comentário
+  Method: `DELETE /comments/:id`
+
+  gRPC (Comments)
+  - Métodos implementados no controller: `CreateComment`, `FindAll`, `FindOne`, `FindByGame`, `FindByUser`, `UpdateComment`, `RemoveComment`.
+  - Exemplos de payloads gRPC coincidem com os JSON acima (usar `id` como bigint onde aplicável).
+
+  ---
+
+  ## 🔧 Exemplos Rápidos (cURL e grpcurl)
+
+  ### cURL (REST)
+
+  Criar jogo:
+  ```bash
+  curl -X POST http://localhost:3000/games \
+    -H "Content-Type: application/json" \
+    -d '{
+      "title": "The Witcher 3",
+      "description": "Um RPG de mundo aberto",
+      "genres": ["RPG", "Action"],
+      "releaseDate": "2015-05-19T00:00:00.000Z",
+      "developer": "CD Projekt Red",
+      "rating": 9.5,
+      "price": 59.99
+    }'
+  ```
+
+  Criar comentário:
+  ```bash
+  curl -X POST http://localhost:3003/comments \
+    -H "Content-Type: application/json" \
+    -d '{
+      "description": "Ótimo jogo!",
+      "timePlayed": 90,
+      "gameId": "123456789012345678",
+      "userId": "user-123"
+    }'
+  ```
+
+  Criar usuário (requere Authorization header):
+  ```bash
+  curl -X POST http://localhost:3002/users \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer <token>" \
+    -d '{
       "nickname": "player_pro",
       "avatarUrl": "https://example.com/avatars/player.jpg",
       "realName": "João Silva",
-      "bio": "Passionate gamer and collector",
-      "level": 1,
+      "bio": "Gamer",
+      "country": "Brazil"
+    }'
+  ```
+
+  ### grpcurl (gRPC)
+
+  Instalar grpcurl:
+  ```bash
+  go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+  ```
+
+  Exemplo: validar token via gRPC (AuthService.Validate):
+  ```bash
+  grpcurl -plaintext -d '{"token":"<jwt>"}' localhost:50051 AuthService.Validate
+  ```
+
+  Criar comentário via gRPC (CommentsService.CreateComment):
+  ```bash
+  grpcurl -plaintext -d '{"description":"Ótimo jogo","timePlayed":60,"gameId":"123456789012345678","userId":"user-123"}' localhost:50053 CommentsService.CreateComment
+  ```
+
+  ---
+
+  ## 📝 Observações finais e próximos passos
+  - Confirme as portas de cada serviço no `apps/*/main.ts` e em `docker-compose.yml` para garantir que os exemplos (`3000`, `3001`, `3002`, `3003`, `5005x`) batem com sua configuração local.
+  - Posso:
+    - padronizar portas no `README.md` e neste arquivo;
+    - gerar README por serviço (`apps/games/README.md`, `apps/comments/README.md`, etc.);
+    - gerar exemplos de `.env.example` para cada serviço.
+
+  _Arquivo gerado a partir da análise dos controllers e DTOs presentes no repositório._
       "experience": 0,
-      "country": "Brazil",
-      "createdAt": "2025-11-22T21:45:00Z",
-      "updatedAt": "2025-11-22T21:45:00Z"
-    },
-    {
-      "id": 2,
-      "nickname": "gamer_king",
-      "avatarUrl": "https://example.com/avatars/king.jpg",
-      "realName": "Maria Santos",
-      "bio": null,
-      "level": 5,
-      "experience": 500,
-      "country": "Portugal",
-      "createdAt": "2025-11-22T20:30:00Z",
-      "updatedAt": "2025-11-22T20:30:00Z"
-    }
-  ]
-}
-```
-
----
-
-#### 3. FindOne RPC
-
-**Request:**
-```json
-{
-  "id": 1
-}
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Passionate gamer and collector",
-  "level": 1,
-  "experience": 0,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00Z",
-  "updatedAt": "2025-11-22T21:45:00Z"
-}
-```
-
----
-
-#### 4. UpdateUser RPC
-
-**Request:**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Updated bio",
-  "country": "Brazil"
-}
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "nickname": "player_pro",
-  "avatarUrl": "https://example.com/avatars/player.jpg",
-  "realName": "João Silva",
-  "bio": "Updated bio",
-  "level": 1,
-  "experience": 0,
-  "country": "Brazil",
-  "createdAt": "2025-11-22T21:45:00Z",
-  "updatedAt": "2025-11-22T21:50:00Z"
-}
-```
-
----
-
-#### 5. RemoveUser RPC
-
-**Request:**
-```json
-{
-  "id": 1
-}
-```
-
-**Response:**
-```json
-{}
-```
-
----
-
-## 🔧 Como Testar com cURL (REST)
-
-### Games
-```bash
-# Create Game
-curl -X POST http://localhost:3000/games \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "The Witcher 3",
-    "description": "An open-world RPG",
-    "genres": ["RPG", "Action"],
-    "releaseDate": "2015-05-19",
-    "developer": "CD Projekt Red",
-    "rating": 9.5,
-    "price": 59.99
-  }'
-
-# Get All Games
-curl http://localhost:3000/games
-
-# Get Game by ID
-curl http://localhost:3000/games/1
-
-# Update Game
-curl -X PUT http://localhost:3000/games/1 \
-  -H "Content-Type: application/json" \
-  -d '{"rating": 9.7}'
-
-# Delete Game
-curl -X DELETE http://localhost:3000/games/1
-```
-
-### Users
-```bash
-# Create User
-curl -X POST http://localhost:3002/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nickname": "player_pro",
-    "avatarUrl": "https://example.com/avatars/player.jpg",
-    "realName": "João Silva",
-    "bio": "Passionate gamer",
-    "country": "Brazil"
-  }'
-
-# Get All Users
-curl http://localhost:3002/users
-
-# Get User by ID
-curl http://localhost:3002/users/1
-
-# Update User
-curl -X PATCH http://localhost:3002/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"level": 3, "experience": 250}'
-
-# Delete User
-curl -X DELETE http://localhost:3002/users/1
-```
-
----
-
-## 🔧 Como Testar gRPC
-
-### Usar grpcurl (CLI tool)
-
-```bash
-# Instalar grpcurl
-go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
-
-# CreateUser
-grpcurl -plaintext -d '{"nickname":"player_pro","realName":"João"}' \
-  localhost:50052 users.UsersService.CreateUser
-
-# FindAll
-grpcurl -plaintext -d '{}' \
-  localhost:50052 users.UsersService.FindAll
-
-# FindOne
-grpcurl -plaintext -d '{"id":1}' \
-  localhost:50052 users.UsersService.FindOne
-
-# UpdateUser
-grpcurl -plaintext -d '{"id":1,"nickname":"updated_nick"}' \
-  localhost:50052 users.UsersService.UpdateUser
-
-# RemoveUser
-grpcurl -plaintext -d '{"id":1}' \
-  localhost:50052 users.UsersService.RemoveUser
-```
-
----
-
-## 📊 Resumo de Endpoints
-
-### Games (REST) - PORT 3000
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST   | /games | Criar jogo |
-| GET    | /games | Listar todos os jogos |
-| GET    | /games/:id | Obter jogo por ID |
-| PUT    | /games/:id | Atualizar jogo |
-| DELETE | /games/:id | Deletar jogo |
-
-### Users (REST) - PORT 3002
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST   | /users | Criar usuário |
-| GET    | /users | Listar todos os usuários |
-| GET    | /users/:id | Obter usuário por ID |
-| PATCH  | /users/:id | Atualizar usuário |
-| DELETE | /users/:id | Deletar usuário |
-
-### Users (gRPC) - PORT 50052
-| RPC | Descrição |
-|-----|-----------|
-| CreateUser | Criar usuário |
-| FindAll | Listar todos os usuários |
-| FindOne | Obter usuário por ID |
-| UpdateUser | Atualizar usuário |
-| RemoveUser | Deletar usuário |
