@@ -26,7 +26,7 @@ export class CommentsService {
 
     try {
       await firstValueFrom(
-        this.httpService.get(`${this.gamesServiceUrl}/games/${gameIdNumber}`)
+        this.httpService.get(`${this.gamesServiceUrl}/api/v1/games/${gameIdNumber}`)
       );
     } catch (error) {
       if (error.response?.status === 404) {
@@ -38,7 +38,7 @@ export class CommentsService {
 
     try {
       await firstValueFrom(
-        this.httpService.get(`${this.usersServiceUrl}/users/${userIdNumber}`)
+        this.httpService.get(`${this.usersServiceUrl}/api/v1/users/${userIdNumber}`)
       );
     } catch (error) {
       // Aqui tratamos se o usuário não existe

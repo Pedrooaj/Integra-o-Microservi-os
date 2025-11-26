@@ -140,7 +140,7 @@ services:
       - "50052:50052"
     environment:
       - DATABASE_USERS_URL=postgresql://postgres:postgres@db-users:5432/db_users_steam_shopee?schema=public
-      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+      - AUTH_SERVICE_URL=${DOMAIN_NAME}
       
     depends_on:
       - db-users
@@ -194,8 +194,8 @@ services:
       - "50055:50055"
     environment:
       - DATABASE_COMMENTS_URL=postgresql://postgres:postgres@db-comments:5432/db_comments_steam_shopee?schema=public
-      - USERS_SERVICE_URL=${USERS_SERVICE_URL}
-      - GAMES_SERVICE_URL=${GAMES_SERVICE_URL}
+      - USERS_SERVICE_URL=${DOMAIN_NAME}
+      - GAMES_SERVICE_URL=${DOMAIN_NAME}
       
     depends_on:
       - db-comments

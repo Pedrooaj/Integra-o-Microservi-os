@@ -32,7 +32,7 @@ export class UsersService {
       // O Axios no NestJS funciona assim: post(url, body, config)
       const response = await firstValueFrom(
         this.httpService.post(
-          `${this.authServiceUrl}/authentication/validate`, // ⚠️ ATENÇÃO NA URL
+          `${this.authServiceUrl}/api/v1/authentication/validate`, // ⚠️ ATENÇÃO NA URL
           {}, // Body vazio (já que não estamos mandando JSON)
           {
             headers: {
