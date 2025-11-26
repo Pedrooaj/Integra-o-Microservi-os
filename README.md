@@ -1,4 +1,4 @@
-# Stema da Shopee
+# Steam da Shopee
 Uma monorepo em NestJS que implementa uma arquitetura de microserviços para gerenciar funcionalidade separadas (autenticação, usuários, jogos, comentários etc.). O repositório agrupa múltiplos serviços para facilitar desenvolvimento, testes e integração entre eles.
 
 **Principais objetivos**: facilitar o desenvolvimento em equipes, permitir deploy independente de serviços e centralizar contratos (gRPC/protos) e esquemas do banco (Prisma).
@@ -8,6 +8,8 @@ Uma monorepo em NestJS que implementa uma arquitetura de microserviços para ger
 - Cada serviço é um app NestJS com seu próprio `prisma` (schema e migrations) e APIs HTTP/gRPC conforme necessário.
 - Banco de dados gerenciado com Prisma + PostgreSQL.
 - Docker + `docker-compose.yml` para orquestração local.
+
+<img width="2146" height="1892" alt="Arq-MS-STEAM-SHOPEE" src="https://github.com/user-attachments/assets/506c0a15-cbf1-4a96-874c-c6a89b69e46d" />
 
 **Serviços (em `apps/`)**
 - `authentication`: login, registro e validação (gRPC/REST). Contém `proto/auth.proto`.
