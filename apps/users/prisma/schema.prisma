@@ -12,6 +12,7 @@ datasource db {
 
 model User {
   id         Int      @id @default(autoincrement())
+  userAuthId String   @unique
   nickname   String   @unique
   avatarUrl  String?
   realName   String?

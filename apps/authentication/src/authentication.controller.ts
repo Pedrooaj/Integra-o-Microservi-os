@@ -2,7 +2,7 @@ import { Body, Controller, Post, Headers } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { AuthenticationService } from './authentication.service';
 
-@Controller("/api/v1/authentication")
+@Controller()
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 

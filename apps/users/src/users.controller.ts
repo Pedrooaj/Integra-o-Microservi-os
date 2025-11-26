@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('api/v1/users')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -26,8 +26,8 @@ export class UsersController {
     if (!authHeader) {
       throw new UnauthorizedException('Token not provided');
     }
-    await this.usersService.validateUserIntegrity(token);
-    return this.usersService.create(createUserDto);
+    const resp = await this.usersService.validateUserIntegrity(token);
+    return this.usersService.create(createUserDto, resp.userId);
   }
 
   @Get()
@@ -54,30 +54,30 @@ export class UsersController {
   }
 
   // gRPC endpoints
-  @GrpcMethod('UsersService', 'CreateUser')
-  createUser(createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
+  // @GrpcMethod('UsersService', 'CreateUser')
+  // createUser(createUserDto: CreateUserDto) {
+  //   return this.usersService.create(createUserDto);
+  // }
 
-  @GrpcMethod('UsersService', 'FindAll')
-  async findAllGrpc() {
-    const users = await this.usersService.findAll();
-    return { users };
-  }
+  // @GrpcMethod('UsersService', 'FindAll')
+  // async findAllGrpc() {
+  //   const users = await this.usersService.findAll();
+  //   return { users };
+  // }
 
-  @GrpcMethod('UsersService', 'FindOne')
-  findOneGrpc({ id }: { id: number }) {
-    return this.usersService.findOne(id);
-  }
+  // @GrpcMethod('UsersService', 'FindOne')
+  // findOneGrpc({ id }: { id: number }) {
+  //   return this.usersService.findOne(id);
+  // }
 
-  @GrpcMethod('UsersService', 'UpdateUser')
-  updateUser(updateUserDto: UpdateUserDto) {
-    return this.usersService.update(updateUserDto.id, updateUserDto);
-  }
+  // @GrpcMethod('UsersService', 'UpdateUser')
+  // updateUser(updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(updateUserDto.id, updateUserDto);
+  // }
 
-  @GrpcMethod('UsersService', 'RemoveUser')
-  async removeUser({ id }: { id: number }) {
-    await this.usersService.remove(id);
-    return {};
-  }
+  // @GrpcMethod('UsersService', 'RemoveUser')
+  // async removeUser({ id }: { id: number }) {
+  //   await this.usersService.remove(id);
+  //   return {};
+  // }
 }

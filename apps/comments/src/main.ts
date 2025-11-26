@@ -12,10 +12,8 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const logger = new Logger('CommentsService');
 
-  // 1. Criar app principal
   const app = await NestFactory.create(CommentsModule);
 
-  // 2. Conectar microserviço gRPC (Passando apenas as OPÇÕES, não uma nova instância)
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {

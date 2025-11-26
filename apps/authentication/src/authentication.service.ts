@@ -1,7 +1,14 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { 
+  Injectable, 
+  ConflictException, 
+  UnauthorizedException, 
+  NotFoundException 
+} from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -10,20 +17,16 @@ export class AuthenticationService {
     private jwtService: JwtService,
   ) {}
 
-  // --- REGISTRO ---
-  async register(data: any) {
+  async register(data: RegisterDto) {
     const { email, password, name } = data;
 
-    // 1. Verificar se usuário existe
     const userExists = await this.prisma.user.findUnique({ where: { email } });
     if (userExists) {
-      return { status: HttpStatus.CONFLICT, error: 'User already exists', id: null, email: null };
+      throw new ConflictException('User already exists');
     }
 
-    // 2. Hash da senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Criar usuário no banco
     const user = await this.prisma.user.create({
       data: {
         email,
@@ -32,39 +35,39 @@ export class AuthenticationService {
       },
     });
 
-    return { status: HttpStatus.CREATED, error: null, id: user.id.toString(), email: user.email };
+    return { 
+      id: user.id.toString(), 
+      email: user.email,
+      message: 'User created successfully'
+    };
   }
 
-  // --- LOGIN ---
-  async login(data: any) {
+  async login(data: LoginDto) {
     const { email, password } = data;
 
-    // 1. Buscar usuário
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return { status: HttpStatus.NOT_FOUND, error: 'User not found', token: null };
+      throw new NotFoundException('User not found'); // Retorna 404
     }
 
-    // 2. Validar Senha
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return { status: HttpStatus.UNAUTHORIZED, error: 'Invalid password', token: null };
+      throw new UnauthorizedException('Invalid password'); // Retorna 401
     }
 
-    // 3. Gerar Token JWT
     const payload = { sub: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
-    return { status: HttpStatus.OK, error: null, token, userId: user.id.toString() };
+    return { token, userId: user.id.toString() };
   }
 
-  // --- VALIDATE ---
   async validate(token: string) {
     try {
         const decoded = this.jwtService.verify(token);
-        return { status: HttpStatus.OK, valid: true, userId: decoded.sub };
+        return { valid: true, userId: decoded.sub };
     } catch (e) {
-        return { status: HttpStatus.UNAUTHORIZED, valid: false, userId: null };
+        // Se o token for inválido, lança erro 401
+        throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

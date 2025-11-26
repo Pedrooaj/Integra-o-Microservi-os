@@ -1,72 +1,102 @@
-import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
-import { RpcException, ClientGrpc } from '@nestjs/microservices';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios'; // <--- O cliente HTTP
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { lastValueFrom } from 'rxjs';
-
-interface GamesServiceClient {
-  findOneGame(data: { id: number }): any;
-}
-
-interface UsersServiceClient {
-  findOne(data: { id: number }): any;
-}
+import { firstValueFrom } from 'rxjs'; // firstValueFrom é mais comum com Axios que lastValueFrom
 
 @Injectable()
-export class CommentsService implements OnModuleInit {
-  private gamesService: GamesServiceClient;
-  private usersService: UsersServiceClient; 
+export class CommentsService {
+  private gamesServiceUrl: string;
+  private usersServiceUrl: string;
 
   constructor(
     private readonly prisma: PrismaService,
-    @Inject('GAMES_PACKAGE') private clientGames: ClientGrpc,
-    @Inject('USERS_PACKAGE') private clientUsers: ClientGrpc 
-  ) {}
-
-  onModuleInit() {
-    this.gamesService = this.clientGames.getService<GamesServiceClient>('GamesService');
-    this.usersService = this.clientUsers.getService<UsersServiceClient>('UsersService');
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService
+  ) {
+    this.gamesServiceUrl = this.configService.getOrThrow<string>('GAMES_SERVICE_URL');
+    this.usersServiceUrl = this.configService.getOrThrow<string>('USERS_SERVICE_URL');
   }
 
   async create(createCommentDto: CreateCommentDto) {
+    const gameIdNumber = Number(createCommentDto.gameId);
+    const userIdNumber = Number(createCommentDto.userId);
+
     try {
-      const gameIdNumber = Number(createCommentDto.gameId);
-      await lastValueFrom(this.gamesService.findOneGame({ id: gameIdNumber }));
+      await firstValueFrom(
+        this.httpService.get(`${this.gamesServiceUrl}/games/${gameIdNumber}`)
+      );
     } catch (error) {
-      console.error('Erro Game:', error);
-      throw new RpcException('Game not found or Service unavailable');
+      if (error.response?.status === 404) {
+        throw new NotFoundException(`Game com id ${gameIdNumber} não encontrado.`);
+      }
+      console.error('Erro ao validar Game:', error.message);
+      throw new InternalServerErrorException('Falha ao comunicar com serviço de Games.');
     }
 
     try {
-      const userIdNumber = Number(createCommentDto.userId);
-      
-      await lastValueFrom(this.usersService.findOne({ id: userIdNumber }));
-      
+      await firstValueFrom(
+        this.httpService.get(`${this.usersServiceUrl}/users/${userIdNumber}`)
+      );
     } catch (error) {
-      console.error('Erro User:', error);
-      throw new RpcException('User not found or Users Service unavailable');
+      // Aqui tratamos se o usuário não existe
+      if (error.response?.status === 404) {
+        throw new NotFoundException(`Usuário com id ${userIdNumber} não encontrado.`);
+      }
+      
+      // Se o serviço de usuário retornou 500, o problema é lá, mas aqui lançamos erro também
+      console.error('Erro ao validar User:', error.message);
+      throw new InternalServerErrorException('Falha ao comunicar com serviço de Users.');
     }
 
     try {
-      return await this.prisma.comment.create({ data: createCommentDto });
+      return await this.prisma.comment.create({
+        data: {
+          description: createCommentDto.description,
+          timePlayed: createCommentDto.timePlayed,
+          gameId: gameIdNumber, 
+          userId: String(userIdNumber), 
+        },
+      });
     } catch (error) {
-      throw new RpcException('Error creating comment');
+      console.error('Erro Prisma:', error);
+      throw new InternalServerErrorException('Erro ao salvar comentário no banco de dados.');
     }
   }
 
-  async findAll() { return await this.prisma.comment.findMany(); }
-  async findOne(id: bigint) { return await this.prisma.comment.findUnique({ where: { id } }); }
-  async findByGame(gameId: bigint) { return await this.prisma.comment.findMany({ where: { gameId } }); }
-  async findByUser(userId: string) { return await this.prisma.comment.findMany({ where: { userId } }); }
+  async findAll() { 
+    return await this.prisma.comment.findMany(); 
+  }
+
+  async findOne(id: bigint) { 
+    const comment = await this.prisma.comment.findUnique({ where: { id } }); 
+    if (!comment) throw new NotFoundException('Comment not found');
+    return comment;
+  }
+
+  async findByGame(gameId: bigint) { 
+    return await this.prisma.comment.findMany({ where: { gameId } }); 
+  }
+  
+  async findByUser(userId: string) { 
+    return await this.prisma.comment.findMany({ where: { userId } }); 
+  }
+
   async update(id: bigint, updateCommentDto: UpdateCommentDto) {
     try {
       return await this.prisma.comment.update({ where: { id }, data: updateCommentDto });
-    } catch (error) { throw new RpcException('Error updating comment'); }
+    } catch (error) { 
+        throw new InternalServerErrorException('Error updating comment'); 
+    }
   }
+
   async remove(id: bigint) {
     try {
       await this.prisma.comment.delete({ where: { id } });
-    } catch (error) { throw new RpcException('Error removing comment'); }
+    } catch (error) { 
+        throw new InternalServerErrorException('Error removing comment'); 
+    }
   }
 }
