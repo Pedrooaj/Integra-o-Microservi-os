@@ -119,11 +119,11 @@ services:
     labels:
       - "traefik.enable=true"
       # Define a rota: se começar com /auth
-      - "traefik.http.routers.auth.rule=PathPrefix(`/api/v1/authentication`)"
+      - "traefik.http.routers.auth.rule=Host(`microservices.pedrooaj.cloud`) && PathPrefix(`/api/v1/authentication`)"
       # Aponta para a porta interna do container (3001)
       - "traefik.http.services.auth.loadbalancer.server.port=3001"
       # Middleware para remover o prefixo /auth antes de enviar para o NestJS
-      - "traefik.http.middlewares.auth-strip.stripprefix.prefixes=/"
+      - "traefik.http.middlewares.auth-strip.stripprefix.prefixes=/api/v1/authentication"
       - "traefik.http.routers.auth.middlewares=auth-strip"
 
 
@@ -148,9 +148,9 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.users.rule=PathPrefix(`/api/v1/users`)"
+      - "traefik.http.routers.users.rule=Host(`microservices.pedrooaj.cloud`) && PathPrefix(`/api/v1/users`)"
       - "traefik.http.services.users.loadbalancer.server.port=3002"
-      - "traefik.http.middlewares.users-strip.stripprefix.prefixes=/"
+      - "traefik.http.middlewares.users-strip.stripprefix.prefixes=/api/v1/users"
       - "traefik.http.routers.users.middlewares=users-strip"
 
 
@@ -175,9 +175,9 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.games.rule=PathPrefix(`/api/v1/games`)"
+      - "traefik.http.routers.games.rule=Host(`microservices.pedrooaj.cloud`) && PathPrefix(`/api/v1/games`)"
       - "traefik.http.services.games.loadbalancer.server.port=3003"
-      - "traefik.http.middlewares.games-strip.stripprefix.prefixes=/"
+      - "traefik.http.middlewares.games-strip.stripprefix.prefixes=/api/v1/games"
       - "traefik.http.routers.games.middlewares=games-strip"
 
   
@@ -203,9 +203,9 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.comments.rule=PathPrefix(`/api/v1/comments`)"
+      - "traefik.http.routers.comments.rule=Host(`microservices.pedrooaj.cloud`) && PathPrefix(`/api/v1/comments`)"
       - "traefik.http.services.comments.loadbalancer.server.port=3004"
-      - "traefik.http.middlewares.comments-strip.stripprefix.prefixes=/"
+      - "traefik.http.middlewares.comments-strip.stripprefix.prefixes=/api/v1/comments"
       - "traefik.http.routers.comments.middlewares=comments-strip"
 
   

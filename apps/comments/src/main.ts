@@ -23,7 +23,7 @@ async function bootstrap() {
     },
   });
 
-
+  app.setGlobalPrefix("api/v1/comments");
   await app.startAllMicroservices();
   logger.log('Comments Service gRPC listening on port 50055');
 
